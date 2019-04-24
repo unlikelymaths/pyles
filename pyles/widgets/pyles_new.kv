@@ -1,0 +1,43 @@
+#:kivy 1.0
+
+#:include widgets/common.kv
+#:import linktypes linktypes.linktypes
+
+<PylesNew>:
+    size_hint_x: 1
+    size_hint_y: 1
+    orientation: 'vertical'
+    BoxLayout:
+        size_hint_y: None
+        height: 30
+        orientation: 'horizontal'
+        Button:
+            size_hint_x: None
+            text: 'Back'
+            on_press: root.on_back_button()
+        Widget:
+            size_hint_x: 1
+        Button:
+            size_hint_x: None
+            text: 'Save'
+    BoxLayout:
+        orientation: 'horizontal'
+        BoxLayout:
+            orientation: 'vertical'
+            SingleLabel:
+                text: 'Icon'
+            Button:
+                text: 'Image'
+        BoxLayout:
+            orientation: 'vertical'
+            GridLayout:
+                cols: 2
+                SingleLabel:
+                    text: 'Name'
+                SingleTextinput:
+                    
+                SingleLabel:
+                    text: 'Type'
+                SingleSpinner:
+                    text: linktypes.default.name
+                    values: linktypes.all.keys()

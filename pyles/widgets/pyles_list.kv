@@ -1,0 +1,26 @@
+#:kivy 1.0
+
+#:include widgets/common.kv
+
+<PylesList>:
+    size_hint_x: 1
+    size_hint_y: 1
+    orientation: 'vertical'
+    BoxLayout:
+        size_hint_y: None
+        height: 30
+        orientation: 'horizontal'
+        Label:
+            size_hint_x: 1
+            text: 'Pyles'
+        Widget:
+            size_hint_x: 2
+        Button:
+            size_hint_x: 1
+            text: 'New'
+            on_press: app.set_widget('new')
+    Button:
+        size_hint_y: 1
+        text: 'List super'
+    SingleLabel:
+        text: 'test'
