@@ -12,30 +12,22 @@ from kivy.uix.popup import Popup
 
 import data
 from util import KeyboardListener
+from widgets.common import DropManager
 from widgets.pyles_list import PylesList
 from widgets.pyles_new import PylesNew
 
 import linktypes.linktypes as linktypes
 
-class Pyles(App):
+class Pyles(App,DropManager):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        #self.drops = []
-        Window.bind(on_dropfile=self.on_dropfile)
     
     def on_start(self):
         self.settings = data.load_settings()
         data.save_settings(self.settings)
         print(self.settings)
         self.set_widget('list')
-       
-    def on_dropfile(self, widget, file_path):
-        mouse_pos = Window.mouse_pos
-        print(mouse_pos)
-        #for func in self.drops:
-        #    if func(widget, file_path, mouse_pos):
-        #        return
-        
+
     def set_widget(self, widget_name):
         self.root.clear_widgets()
         if widget_name == 'list':
