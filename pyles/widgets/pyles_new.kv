@@ -1,7 +1,10 @@
 #:kivy 1.0
 
 #:include widgets/common.kv
+#:include widgets/image_widget.kv
 #:import linktypes linktypes.linktypes
+#  :import ImageWidget widgets.image_widget.ImageWidget
+
 
 <PylesNew>:
     size_hint_x: 1
@@ -26,8 +29,7 @@
             orientation: 'vertical'
             SingleLabel:
                 text: 'Icon'
-            Button:
-                text: 'Image'
+            ImageWidget:
         BoxLayout:
             orientation: 'vertical'
             GridLayout:
