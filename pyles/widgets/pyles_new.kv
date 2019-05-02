@@ -1,9 +1,10 @@
 #:kivy 1.0
 
-#:include widgets/common.kv
-#:include widgets/image_widget.kv
 #:import linktypes linktypes.linktypes
-#  :import ImageWidget widgets.image_widget.ImageWidget
+#:import ImageWidget widgets.image_widget.ImageWidget
+#:import SingleLabel widgets.common.SingleLabel
+#:import SingleTextinput widgets.common.SingleTextinput
+#:import SingleSpinner widgets.common.SingleSpinner
 
 
 <PylesNew>:
@@ -34,6 +35,7 @@
             orientation: 'vertical'
             GridLayout:
                 cols: 2
+                size_hint_y: None
                 SingleLabel:
                     text: 'Name'
                 SingleTextinput:
@@ -41,5 +43,12 @@
                 SingleLabel:
                     text: 'Type'
                 SingleSpinner:
+                    id: linktype_selection
                     text: linktypes.default.name
                     values: linktypes.all.keys()
+                    on_text: root.on_linktype(self.text)
+            GridLayout:
+                cols: 2
+                size_hint_y: None
+                id: linktype_settings
+            Widget:

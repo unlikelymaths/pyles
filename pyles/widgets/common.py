@@ -1,8 +1,22 @@
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.widget import Widget
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.spinner import Spinner
+from kivy.lang import Builder
 
+Builder.load_file('widgets/common.kv')
 
+class SingleLabel(Label):
+    pass
+
+class SingleTextinput(TextInput):
+    pass
+    
+class SingleSpinner(Spinner):
+    pass
+    
 class DropManager():
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

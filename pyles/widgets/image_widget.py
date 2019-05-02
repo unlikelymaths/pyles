@@ -1,9 +1,12 @@
 from kivy.graphics import Rectangle
 from kivy.properties import NumericProperty
+from kivy.lang import Builder
 
 from widgets.common import DropWidget
 from data.image import Image, ImageLoadError
 from data.imagesection import ImageSection
+
+Builder.load_file('widgets/image_widget.kv')
 
 class ImageWidget(DropWidget):
 
