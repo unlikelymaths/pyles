@@ -1,4 +1,5 @@
 from kivy.graphics import Rectangle
+from kivy.properties import NumericProperty
 
 from widgets.common import DropWidget
 from data.image import Image, ImageLoadError
@@ -15,9 +16,16 @@ class ImageWidget(DropWidget):
     
     def draw(self):
         if self.image:
+            aspect_ratio = self.width / self.height
+            if aspect_ratio > self.image.aspect_ratio:
+                size = (self.height * self.image.aspect_ratio, self.height)
+                pos = (self.pos[0] + self.width/2 - size[0]/2, self.pos[1])
+            else:
+                size = (self.width, self.width / self.image.aspect_ratio)
+                pos = (self.pos[0], self.pos[1] + self.height/2 - size[1]/2)
             with self.canvas:
                 self.canvas.clear()
-                Rectangle(texture=self.image.texture, pos=self.pos, size=(self.width, self.height))
+                Rectangle(texture=self.image.texture, pos=pos, size=size)
             
     def drop(self, file_path):
         accept_drop = False

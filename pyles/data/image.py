@@ -31,6 +31,11 @@ class Image():
         self._load_pil_image()
         return self._size
     
+    @property
+    def aspect_ratio(self):
+        self._load_pil_image()
+        return self._size[0] / self._size[1]
+        
     def _load_pil_image(self):
         if self._pil_image is None and self._filename is not None:
             try:
