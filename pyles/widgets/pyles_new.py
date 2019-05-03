@@ -8,7 +8,7 @@ from kivy.app import App
 
 from util import KeyboardListener
 from linktypes import linktypes
-from widgets.common import SingleLabel, SingleTextinput
+from widgets.common import SingleLabel
 
 Builder.load_file('widgets/pyles_new.kv')
 
@@ -20,16 +20,23 @@ class PylesNew(BoxLayout):
         self.app = App.get_running_app()
         self.on_linktype(self.ids.linktype_selection.text)
         
-    
     def on_back_button(self):
         self.app.set_widget('list')
         
+    def on_save_button(self):
+        settings = {'name': self.ids.name_input.text}
+        if hasattr(self.linktype, 'settings'):
+            for setting in self.linktype.settings:
+                settings[setting.name] = setting.get_value()
+        print(settings)
+        self.app.set_widget('list')
+                
     def on_linktype(self, linktype): 
-        linktype = linktypes.all[linktype]
+        self.linktype = linktypes.all[linktype]
         grid_layout = self.ids.linktype_settings
         
         grid_layout.clear_widgets()
-        if hasattr(linktype, 'settings'):
-            for setting in linktype.settings:
+        if hasattr(self.linktype, 'settings'):
+            for setting in self.linktype.settings:
                 grid_layout.add_widget(SingleLabel(text=setting.name))
-                grid_layout.add_widget(SingleTextinput())
+                grid_layout.add_widget(setting.get_widget())

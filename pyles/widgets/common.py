@@ -10,7 +10,7 @@ Builder.load_file('widgets/common.kv')
 
 class SingleLabel(Label):
     pass
-
+    
 class SingleTextinput(TextInput):
     pass
     
@@ -30,6 +30,7 @@ class DropManager():
         self._drop_widgets.remove(drop_widget)
         
     def on_dropfile(self, widget, file_path):
+        file_path = file_path.decode('utf8')
         for drop_widget in self._drop_widgets:
             if drop_widget.check_drop(file_path, Window.mouse_pos):
                 return
@@ -53,3 +54,8 @@ class DropWidget(Widget):
         
     def drop(self, file_path):
         pass
+        
+        
+class FilePathTextInput(SingleTextinput, DropWidget):
+    def drop(self, file_path):
+        self.text = file_path

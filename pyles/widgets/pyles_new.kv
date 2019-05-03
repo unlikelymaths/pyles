@@ -6,6 +6,7 @@
 #:import SingleTextinput widgets.common.SingleTextinput
 #:import SingleSpinner widgets.common.SingleSpinner
 
+#:set left_column 0.3
 
 <PylesNew>:
     size_hint_x: 1
@@ -24,6 +25,7 @@
         Button:
             size_hint_x: None
             text: 'Save'
+            on_press: root.on_save_button()
     BoxLayout:
         orientation: 'horizontal'
         BoxLayout:
@@ -37,18 +39,23 @@
                 cols: 2
                 size_hint_y: None
                 SingleLabel:
+                    size_hint_x: left_column
                     text: 'Name'
                 SingleTextinput:
-                    
+                    size_hint_x: 1-left_column
+                    id: name_input
                 SingleLabel:
+                    size_hint_x: left_column
                     text: 'Type'
                 SingleSpinner:
+                    size_hint_x: 1-left_column
                     id: linktype_selection
                     text: linktypes.default.name
                     values: linktypes.all.keys()
                     on_text: root.on_linktype(self.text)
             GridLayout:
-                cols: 2
+                cols: 1
                 size_hint_y: None
                 id: linktype_settings
             Widget:
+                size_hint_y: 1

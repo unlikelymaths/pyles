@@ -37,7 +37,7 @@ class ImageWidget(DropWidget):
     def drop(self, file_path):
         accept_drop = False
         try:
-            self.image = Image(file_path.decode('ascii'), load_now=True)
+            self.image = Image(file_path, load_now=True)
             short_edge = min(self.image.size)
             self.imagesection = ImageSection(self.image, size=(short_edge,short_edge))
             accept_drop = True
