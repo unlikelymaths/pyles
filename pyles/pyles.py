@@ -13,7 +13,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 
-from data import settings
+from data.global_settings import global_settings
 from util import KeyboardListener
 from widgets.common import DropManager
 from widgets.pyles_list import PylesList
@@ -26,9 +26,6 @@ class Pyles(App,DropManager):
         super().__init__(**kwargs)
     
     def on_start(self):
-        self.settings = settings.load_settings()
-        settings.save_settings(self.settings)
-        print(self.settings)
         self.set_widget('list')
 
     def set_widget(self, widget_name):
