@@ -33,6 +33,7 @@
             SingleLabel:
                 text: 'Icon'
             ImageWidget:
+                id: image_widget
         BoxLayout:
             orientation: 'vertical'
             GridLayout:
@@ -52,7 +53,7 @@
                     id: linktype_selection
                     text: linktypes.default.name
                     values: linktypes.all.keys()
-                    on_text: root.on_linktype(self.text)
+                    on_text: root.on_linktypename(self.text)
             GridLayout:
                 cols: 1
                 size_hint_y: None

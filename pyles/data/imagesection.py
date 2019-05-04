@@ -27,7 +27,16 @@ class ImageSection():
         self._relpos = None
         self._relsize = None
         self._aspect_ratio = None
-               
+          
+    def save_as(self, file_path):
+        image_section = self.image.image.crop(
+            (self.pos[0], 
+             self.pos[1], 
+             self.pos[0] + self.size[0], 
+             self.pos[1] + self.size[1]))
+        image_section.save(file_path)
+            
+          
     @property
     def tex_coords(self):
         if self._tex_coords is None:

@@ -40,6 +40,7 @@ class ImageWidget(DropWidget):
             self.image = Image(file_path, load_now=True)
             short_edge = min(self.image.size)
             self.imagesection = ImageSection(self.image, size=(short_edge,short_edge))
+            print(self.imagesection.tex_coords)
             accept_drop = True
         except ImageLoadError:
             self.image = None

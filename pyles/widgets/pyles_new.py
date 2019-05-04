@@ -7,6 +7,7 @@ from kivy.clock import Clock
 from kivy.app import App
 
 from util import KeyboardListener
+from data.entry import Entry, EntryException
 from linktypes import linktypes
 from widgets.common import SingleLabel
 
@@ -18,25 +19,28 @@ class PylesNew(BoxLayout):
     def __init__(self, **kwargs):
         super(PylesNew, self).__init__(**kwargs)
         self.app = App.get_running_app()
-        self.on_linktype(self.ids.linktype_selection.text)
+        self.entry = None
+        self.on_linktypename(self.ids.linktype_selection.text)
         
     def on_back_button(self):
         self.app.set_widget('list')
         
     def on_save_button(self):
-        settings = {'name': self.ids.name_input.text}
-        if hasattr(self.linktype, 'settings'):
-            for setting in self.linktype.settings:
-                settings[setting.name] = setting.get_value()
-        print(settings)
-        self.app.set_widget('list')
-                
-    def on_linktype(self, linktype): 
-        self.linktype = linktypes.all[linktype]
-        grid_layout = self.ids.linktype_settings
+        linktypename = self.ids.linktype_selection.text
+        kwargs = {'name': self.ids.name_input.text,
+            'linktypename': linktypename,
+            'imagesection': self.ids.image_widget.imagesection,
+            'linktypeconfig': {
+                setting.key: setting.value 
+                for setting in linktypes.get_config(linktypename)}}
         
-        grid_layout.clear_widgets()
-        if hasattr(self.linktype, 'settings'):
-            for setting in self.linktype.settings:
-                grid_layout.add_widget(SingleLabel(text=setting.name))
-                grid_layout.add_widget(setting.get_widget())
+        try:
+            self.entry = Entry(**kwargs)
+        except EntryException as e:
+            print(e)
+                
+    def on_linktypename(self, linktypename):
+        self.ids.linktype_settings.clear_widgets()
+        for setting in linktypes.get_config(linktypename):
+            self.ids.linktype_settings.add_widget(SingleLabel(text=setting.label))
+            self.ids.linktype_settings.add_widget(setting.get_widget())

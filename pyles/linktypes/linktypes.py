@@ -10,5 +10,9 @@ all = {mod.name: mod for mod in [default] + [
     if name.startswith('pylesltype_')
     ]}
 
-for t in all.keys():
-    print(t)
+def get_config(linktypename):
+    try:
+        config = all[linktypename].config
+    except  AttributeError:
+        config = {}
+    return config
