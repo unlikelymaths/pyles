@@ -66,11 +66,12 @@ class Entry():
             
     def write_image(self, imagesection):
         imagesection.save_as(self.icon_path)
+        imagesection.save_as(self.ico_path)
         
     def write_link(self):
         link = Dispatch('WScript.Shell').CreateShortCut(self.link_path)
         link.Targetpath = self.vbs_path
-        link.IconLocation = self.icon_path
+        link.IconLocation = self.ico_path
         link.WorkingDirectory = self.path
         link.save()
         
@@ -93,6 +94,10 @@ class Entry():
     @property
     def icon_path(self):
         return path.join(self.path, 'icon.jpg')
+        
+    @property
+    def ico_path(self):
+        return path.join(self.path, 'icon.ico')
         
     @property
     def link_path(self):
