@@ -2,7 +2,7 @@ import json
 from os import path, mkdir
 from win32com.client import Dispatch
 
-from linktypes import linktypes
+from linktypes import linktype_manager
 from data.paths import MAINDIR, LINKDIR
 from data.manifest import get_manifest
 
@@ -36,7 +36,7 @@ class Entry():
             raise e
         
         # Set linktype and config
-        self.linktype = linktypes.all[linktypename]
+        self.linktype = linktype_manager.all[linktypename]
         self.linktypeconfig = linktypeconfig
         
         # Write data

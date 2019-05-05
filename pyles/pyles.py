@@ -19,8 +19,6 @@ from widgets.common import DropManager
 from widgets.pyles_list import PylesList
 from widgets.pyles_new import PylesNew
 
-import linktypes.linktypes as linktypes
-
 class Pyles(App,DropManager):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

@@ -1,0 +1,3 @@
+import linktypes.pylesltype_steam
+import linktypes.pylesltype_webpage
+import linktypes.linktype_manager
