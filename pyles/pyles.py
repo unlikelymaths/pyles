@@ -5,6 +5,7 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.properties import NumericProperty, ReferenceListProperty,ObjectProperty
+from kivy.lang import Builder
 
 from kivy.uix.gridlayout  import GridLayout
 from kivy.uix.boxlayout  import BoxLayout
@@ -19,6 +20,10 @@ from widgets.common import DropManager
 from widgets.pyles_list import PylesList
 from widgets.pyles_new import PylesNew
 
+from widgets.util import widget_path
+
+pyles_kv = Builder.load_file(widget_path('pyles.kv'))
+
 class Pyles(App,DropManager):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -26,6 +31,9 @@ class Pyles(App,DropManager):
     def on_start(self):
         self.set_widget('list')
 
+    def build(self):
+        return pyles_kv
+        
     def set_widget(self, widget_name):
         self.root.clear_widgets()
         if widget_name == 'list':

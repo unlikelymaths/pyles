@@ -6,7 +6,9 @@ from widgets.common import DropWidget
 from data.image import Image, ImageLoadError
 from data.imagesection import ImageSection
 
-Builder.load_file('widgets/image_widget.kv')
+from widgets.util import widget_path
+
+Builder.load_file(widget_path('widgets/image_widget.kv'))
 
 class ImageWidget(DropWidget):
 

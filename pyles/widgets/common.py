@@ -6,7 +6,9 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.spinner import Spinner
 from kivy.lang import Builder
 
-Builder.load_file('widgets/common.kv')
+from widgets.util import widget_path
+
+Builder.load_file(widget_path('widgets/common.kv'))
 
 class SingleLabel(Label):
     pass

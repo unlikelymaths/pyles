@@ -11,7 +11,9 @@ from data.entry import Entry, EntryException
 from linktypes import linktype_manager
 from widgets.common import SingleLabel
 
-Builder.load_file('widgets/pyles_new.kv')
+from widgets.util import widget_path
+
+Builder.load_file(widget_path('widgets/pyles_new.kv'))
 
 
 class PylesNew(BoxLayout):

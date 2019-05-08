@@ -7,14 +7,18 @@ from kivy.clock import Clock
 from kivy.app import App
 
 from util import KeyboardListener
+from data.entry import EntryList
 
-Builder.load_file('widgets/pyles_list.kv')
+from widgets.util import widget_path
+
+Builder.load_file(widget_path('widgets/pyles_list.kv'))
 
 class PylesList(BoxLayout, KeyboardListener):
     tabs = ObjectProperty(None)
      
     def __init__(self, **kwargs):
         super(PylesList, self).__init__(**kwargs)
+        self.entry_list = EntryList()
         #self.app = App.get_running_app()
         #print(self.app)
         

@@ -6,8 +6,9 @@ from kivy.uix.treeview import TreeViewLabel
 from kivy.clock import Clock
 from kivy.app import App
 
+from widgets.util import widget_path
 
-Builder.load_file('widgets/settings_widget.kv')
+Builder.load_file(widget_path('widgets/settings_widget.kv'))
 
 
 class SettingsWidget(GridLayout):
