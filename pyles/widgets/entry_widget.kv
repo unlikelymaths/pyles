@@ -1,0 +1,14 @@
+#:kivy 1.0
+
+#:import ImageWidget widgets.image_widget.ImageWidget
+#:import SingleLabel widgets.common.SingleLabel
+
+<EntryWidget>:
+    size_hint_x: 1
+    size_hint_y: 1
+    orientation: 'vertical'
+    ImageWidget:
+        id: image_widget
+    SingleLabel:
+        text: root.entry.name
+        id: name_input

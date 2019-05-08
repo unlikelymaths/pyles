@@ -19,8 +19,12 @@
             size_hint_x: 1
             text: 'New'
             on_press: app.set_widget('new')
-    Button:
+    GridLayout:
+        id: entry_widget
+        cols: 3
+        size_hint_x: 1
+        size_hint_y: None
+    Widget:
         size_hint_y: 1
-        text: 'List super'
     SingleLabel:
         text: 'test'

@@ -1,6 +1,7 @@
 import json
-from os import path, mkdir
+from os import path, mkdir, listdir, remove
 from win32com.client import Dispatch
+from kivy.logger import Logger
 
 from linktypes import linktype_manager
 from data.paths import MAINDIR, LINKDIR
@@ -9,6 +10,27 @@ from data.manifest import get_manifest
 class EntryException(ValueError):
     pass
 
+class EntryList():
+    
+    def __init__(self):
+        self.entries = []
+        self.load_entries()
+        
+    def load_entries(self):
+        # Iterate all directories in MAINDIR
+        entry_names = [dir for dir in listdir(MAINDIR) if path.isdir(path.join(MAINDIR,dir))]
+        for name in entry_names:
+            entry = Entry(name)
+            self.entries.append(entry)
+                            
+        # Remove all other links
+        for link in listdir(LINKDIR):
+            linkname = link.split('.')[0]
+            if linkname not in entry_names:
+                remove(path.join(LINKDIR,link))
+                Logger.info('Entry: Removed orphaned link for "{}"'.format(linkname))
+            
+    
 class Entry():
     def __init__(self, name, **kwargs):
         if len(kwargs) > 0:
@@ -46,8 +68,13 @@ class Entry():
         self.write_image(imagesection)
         self.write_link()
         
-    def load(self, path):
-        pass
+    def load(self, name):
+        self.name = name
+        
+        # Check if the corresponding link exists. Otherwise create
+        if not path.isfile(self.link_path):
+            self.write_link()
+            Logger.info('Entry: Created missing link for "{}"'.format(self.name))
     
     def write_vbs(self):
         vbs_str = self.linktype.get_vbs(self.linktypeconfig)

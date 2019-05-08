@@ -36,17 +36,24 @@ class ImageWidget(DropWidget):
                           tex_coords=self.imagesection.tex_coords,
                           pos=pos, size=size)
             
-    def drop(self, file_path):
-        accept_drop = False
+    def load_file(self, file_path):
         try:
             self.image = Image(file_path, load_now=True)
             short_edge = min(self.image.size)
             self.imagesection = ImageSection(self.image, size=(short_edge,short_edge))
             print(self.imagesection.tex_coords)
-            accept_drop = True
-        except ImageLoadError:
+        except ImageLoadError as e:
             self.image = None
             self.imagesection = None
+            raise e
             #TODO: Output error message to user
+    
+    def drop(self, file_path):
+        accept_drop = False
+        try:
+            self.load_file(file_path)
+            accept_drop = True
+        except ImageLoadError:
+            pass
         self.draw()
         return accept_drop
