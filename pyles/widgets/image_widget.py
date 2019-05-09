@@ -16,11 +16,12 @@ class ImageWidget(DropWidget):
         super().__init__(**kwargs)
         self.image = None
         self.imagesection = None
-        self.bind(size=self.size_callback)
+        self.bind(size=self.layout_callback)
+        self.bind(pos=self.layout_callback)
         
-    def size_callback(self, instance, value):
+    def layout_callback(self, instance, value):
         self.draw()
-    
+            
     def draw(self):
         if self.imagesection:
             aspect_ratio = self.width / self.height

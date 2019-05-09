@@ -19,6 +19,7 @@ class PylesList(BoxLayout, KeyboardListener):
      
     def __init__(self, **kwargs):
         super(PylesList, self).__init__(**kwargs)
+        self.ids.entry_widget.bind(minimum_height=self.ids.entry_widget.setter('height'))
         self.entry_list = EntryList()
         for entry in self.entry_list.entries:
             l = EntryWidget(entry=entry)

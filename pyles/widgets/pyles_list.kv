@@ -19,12 +19,10 @@
             size_hint_x: 1
             text: 'New'
             on_press: app.set_widget('new')
-    GridLayout:
-        id: entry_widget
-        cols: 3
-        size_hint_x: 1
-        size_hint_y: None
-    Widget:
-        size_hint_y: 1
+    ScrollView:
+        StackLayout:
+            id: entry_widget
+            size_hint_x: 1
+            size_hint_y: None
     SingleLabel:
-        text: 'test'
+        text: ''
