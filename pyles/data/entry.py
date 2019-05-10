@@ -1,5 +1,6 @@
 import json
 from os import path, mkdir, listdir, remove
+from shutil import rmtree
 from win32com.client import Dispatch
 from kivy.logger import Logger
 
@@ -75,6 +76,12 @@ class Entry():
         if not path.isfile(self.link_path):
             self.write_link()
             Logger.info('Entry: Created missing link for "{}"'.format(self.name))
+    
+    def delete(self):
+        # Remove directory
+        rmtree(self.path)
+        # Remove link
+        remove(self.link_path)
     
     def write_vbs(self):
         vbs_str = self.linktype.get_vbs(self.linktypeconfig)
