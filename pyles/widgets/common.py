@@ -29,21 +29,42 @@ class DropManager():
         self._drop_widgets.append(drop_widget)
     
     def remove_drop_widget(self, drop_widget):
-        self._drop_widgets.remove(drop_widget)
+        if drop_widget in self._drop_widgets:
+            self._drop_widgets.remove(drop_widget)
         
     def on_dropfile(self, widget, file_path):
         file_path = file_path.decode('utf8')
+        invalid_drop_widgets = []
         for drop_widget in self._drop_widgets:
-            if drop_widget.check_drop(file_path, Window.mouse_pos):
-                return
-
+            try:
+                if drop_widget.check_drop(file_path, Window.mouse_pos):
+                    return
+            except ReferenceError:
+                invalid_drop_widgets.append(drop_widget)
+        for drop_widget in invalid_drop_widgets:
+            self.remove_drop_widget(drop_widget)
+        
 class DropWidget(Widget):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.app = App.get_running_app()
-                
-    def on_parent(self, widget, parent):
+        self.bind(parent=self.parent_callback)
+        self.parents = []
+
+    def parent_callback(self, instance, value):
+        for parent in self.parents:
+            try:
+                parent.unbind(parent=self.parent_callback)
+            except ReferenceError:
+                pass
+        parent = self.parent
+        while isinstance(parent,Widget):
+            parent_ref = parent.proxy_ref
+            self.parents.append(parent_ref)
+            parent_ref.bind(parent=self.parent_callback)
+            parent = parent.parent
+            
         if parent is None:
             self.app.remove_drop_widget(self.proxy_ref)
         else:
