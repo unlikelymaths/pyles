@@ -71,6 +71,7 @@ class DropWidget(Widget):
             self.app.add_drop_widget(self.proxy_ref)
         
     def check_drop(self, file_path, mouse_pos):
+        mouse_pos = self.to_widget(*mouse_pos)
         if self.collide_point(*mouse_pos):
             return self.drop(file_path)
         return False
