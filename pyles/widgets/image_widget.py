@@ -36,18 +36,23 @@ class ImageWidget(DropWidget):
                 Rectangle(texture=self.imagesection.texture, 
                           tex_coords=self.imagesection.tex_coords,
                           pos=pos, size=size)
-            
-    def load_file(self, file_path):
-        try:
-            self.image = Image(file_path, load_now=True)
+    
+    def on_state(self, image, state):
+        self.clear_widgets()
+        if state == Image.LOADING:
+            pass #TODO
+        elif state == Image.LOADED:
+            self.image.texture
             short_edge = min(self.image.size)
             self.imagesection = ImageSection(self.image, size=(short_edge,short_edge))
-            print(self.imagesection.tex_coords)
-        except ImageLoadError as e:
-            self.image = None
-            self.imagesection = None
-            raise e
-            #TODO: Output error message to user
+        elif state == Image.ERROR:
+            pass #TODO
+        self.draw()
+            
+        
+    def load_file(self, file_path):
+        self.image = Image(file_path)
+        self.image.bind(state=self.on_state)
     
     def drop(self, file_path):
         accept_drop = False
