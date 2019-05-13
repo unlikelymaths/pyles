@@ -9,15 +9,19 @@ from kivy.clock import Clock
 class ImageLoadError(IOError):
     pass
 
+def load_image(filename):
+    #Load image file
+    image = PIL.Image.open(filename)
+    # Get rawdata from image
+    buf = image.getdata()
+    # Unpack tuples and form array
+    buf = [int(val) for triple in buf for val in triple]
+    arr = array('B', buf)
+    return image, arr
+    
 def load_image_to_queue(filename, queue):
     try:
-        #Load image file
-        image = PIL.Image.open(filename)
-        # Get rawdata from image
-        buf = image.getdata()
-        # Unpack tuples and form array
-        buf = [int(val) for triple in buf for val in triple]
-        arr = array('B', buf)
+        image, arr = load_image(filename)
         queue.put({'image': image, 'arr': arr})
     except OSError:
         error = 'Cannot open image "{}".'.format(filename)
@@ -54,7 +58,8 @@ class Image(EventDispatcher):
             elif 'error':
                 self._error = queue_dct['error']
                 self.state = Image.FAILED
-            self._loader.join()
+            if self._loader is not None:
+                self._loader.join()
             self._loader = None
             self._queue = None
             return False
@@ -71,8 +76,13 @@ class Image(EventDispatcher):
                 self._loader.start()   
                 Clock.schedule_interval(self._check_image, 0.05)
             else:
-                self._load_image()
-                #self._check_image()
+                try:
+                    self._pil_image, self._arr = load_image(self.filename)
+                    self.state = Image.LOADED
+                except OSError:
+                    self._error = 'Cannot open image "{}".'.format(self.filename)
+                    self.state = Image.LOADED
+                    print(self._error)
         
     @property
     def image(self):

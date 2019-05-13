@@ -7,6 +7,8 @@ from data.image import Image, ImageLoadError
 from data.imagesection import ImageSection
 
 from widgets.util import widget_path
+from widgets.loading_widget import LoadingWidget
+
 
 Builder.load_file(widget_path('widgets/image_widget.kv'))
 
@@ -23,43 +25,42 @@ class ImageWidget(DropWidget):
         self.draw()
             
     def draw(self):
-        if self.imagesection:
-            aspect_ratio = self.width / self.height
-            if aspect_ratio > self.imagesection.aspect_ratio:
-                size = (self.height * self.imagesection.aspect_ratio, self.height)
-                pos = (self.pos[0] + self.width/2 - size[0]/2, self.pos[1])
-            else:
-                size = (self.width, self.width / self.imagesection.aspect_ratio)
-                pos = (self.pos[0], self.pos[1] + self.height/2 - size[1]/2)
-            with self.canvas:
+        if self.image is not None:
+            if self.image.state == Image.LOADED:
+                aspect_ratio = self.width / self.height
+                if aspect_ratio > self.imagesection.aspect_ratio:
+                    size = (self.height * self.imagesection.aspect_ratio, self.height)
+                    pos = (self.pos[0] + self.width/2 - size[0]/2, self.pos[1])
+                else:
+                    size = (self.width, self.width / self.imagesection.aspect_ratio)
+                    pos = (self.pos[0], self.pos[1] + self.height/2 - size[1]/2)
                 self.canvas.clear()
-                Rectangle(texture=self.imagesection.texture, 
-                          tex_coords=self.imagesection.tex_coords,
-                          pos=pos, size=size)
+                with self.canvas:
+                    Rectangle(texture=self.imagesection.texture, 
+                            tex_coords=self.imagesection.tex_coords,
+                            pos=pos, size=size)
+        else:
+            self.canvas.clear()
     
     def on_state(self, image, state):
         self.clear_widgets()
         if state == Image.LOADING:
-            pass #TODO
+            self.add_widget(LoadingWidget())
         elif state == Image.LOADED:
             self.image.texture
             short_edge = min(self.image.size)
             self.imagesection = ImageSection(self.image, size=(short_edge,short_edge))
-        elif state == Image.ERROR:
-            pass #TODO
+        elif state == Image.FAILED:
+            self.image = None
+            self.imagesection = None
         self.draw()
             
         
     def load_file(self, file_path):
+        self.canvas.clear()
         self.image = Image(file_path)
         self.image.bind(state=self.on_state)
     
     def drop(self, file_path):
-        accept_drop = False
-        try:
-            self.load_file(file_path)
-            accept_drop = True
-        except ImageLoadError:
-            pass
-        self.draw()
-        return accept_drop
+        self.load_file(file_path)
+        return True
