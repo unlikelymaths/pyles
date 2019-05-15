@@ -8,3 +8,4 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
     
 loading_path = resource_path('loading.png')
+card_path = resource_path('card.png')

@@ -2,6 +2,7 @@
 
 #:import ImageWidget widgets.image_widget.ImageWidget
 #:import SingleLabel widgets.common.SingleLabel
+#:import CardWidget widgets.card_widget.CardWidget
 
 <EntryWidget>:
     size_hint_x: None
@@ -9,8 +10,17 @@
     width: 300
     height: 200
     orientation: 'vertical'
-    ImageWidget:
-        id: image_widget
-    SingleLabel:
-        text: root.entry.name
-        id: name_input
+    CardWidget:
+        size_hint_x: 1
+        size_hint_y: 1
+        BoxLayout:
+            orientation: 'horizontal'
+            ImageWidget:
+                id: image_widget
+                size_hint_x: None
+                size_hint_y: None
+                width: 160
+                height: 160
+            SingleLabel:
+                text: root.entry.name
+                id: name_input
