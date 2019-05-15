@@ -27,13 +27,14 @@ def load_image_to_queue(filename, queue):
     except OSError:
         error = 'Cannot open image "{}".'.format(filename)
         queue.put({'error': error})
-    
+       
 class Image(EventDispatcher):
     EMPTY = 0
     LOADING = 1
     FAILED = 2
     LOADED = 3
     state = NumericProperty(EMPTY)
+    _current_loader = None
     
     def __init__(self, filename, load_async = True, load_now = True):
         self.filename = filename
@@ -62,20 +63,27 @@ class Image(EventDispatcher):
             if self._loader is not None:
                 self._loader.join()
             self._loader = None
+            Image._current_loader = None
             self._queue = None
             return False
-            
+    
+    def _start_loader(self, _):
+        if Image._current_loader is None:
+            self._queue = multiprocessing.Queue()
+            self._loader = multiprocessing.Process(
+                target=load_image_to_queue, 
+                args=(self.filename,self._queue),
+                daemon=True)
+            self._loader.start()   
+            Image._current_loader = self._loader
+            Clock.schedule_interval(self._check_image, 0.01)
+            return False
+    
     def load_image(self):
         if self.state == Image.EMPTY:
             self.state = Image.LOADING
             if self.load_async:
-                self._queue = multiprocessing.Queue()
-                self._loader = multiprocessing.Process(
-                    target=load_image_to_queue, 
-                    args=(self.filename,self._queue),
-                    daemon=True)
-                self._loader.start()   
-                Clock.schedule_interval(self._check_image, 0.05)
+                Clock.schedule_interval(self._start_loader, 0.01)
             else:
                 try:
                     self._pil_image, self._arr = load_image(self.filename)
