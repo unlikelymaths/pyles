@@ -12,6 +12,7 @@ class ImageLoadError(IOError):
 def load_image(filename):
     #Load image file
     image = PIL.Image.open(filename)
+    image = image.convert('RGB')
     # Get rawdata from image
     buf = image.getdata()
     # Unpack tuples and form array
