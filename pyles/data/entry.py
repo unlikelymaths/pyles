@@ -71,6 +71,7 @@ class Entry():
         
     def load(self, name):
         self.name = name
+        self.image = None
         
         # Check if the corresponding link exists. Otherwise create
         if not path.isfile(self.link_path):

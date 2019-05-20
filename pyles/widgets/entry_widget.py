@@ -21,4 +21,4 @@ class EntryWidget(BoxLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.ids.image_widget.load_file(self.entry.icon_path)
+        self.ids.image_widget.load_entry(self.entry)

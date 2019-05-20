@@ -55,7 +55,17 @@ class ImageWidget(DropWidget):
             self.imagesection = None
         self.draw()
             
-        
+    def load_entry(self, entry):
+        self.canvas.clear()
+        if entry.image is None:
+            entry.image = Image(entry.icon_path)
+        self.image = entry.image
+        if self.image.state == Image.LOADED:
+            self.on_state(self.image, self.image.state)
+        else:
+            self.on_state(self.image, self.image.state)
+            self.image.bind(state=self.on_state)
+    
     def load_file(self, file_path):
         self.canvas.clear()
         self.image = Image(file_path)
