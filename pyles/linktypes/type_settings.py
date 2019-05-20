@@ -1,8 +1,9 @@
 import weakref
+import importlib
 from widgets.common import FilePathTextInput
  
 class GenericSetting():
-    def __init__(self, key, label = ''):
+    def __init__(self, key, label = '', **kwargs):
         self.key = key
         self.label = label
         self.widget = None
@@ -21,9 +22,10 @@ def get_setting(config, key):
 class FilePathSetting(GenericSetting):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._value = kwargs.get('value', '')
         
     def get_widget(self):
-        widget = FilePathTextInput()
+        widget = FilePathTextInput(text = self._value)
         self.widget = weakref.proxy(widget)
         return widget
         
@@ -35,4 +37,4 @@ class FilePathSetting(GenericSetting):
     def value(self):
         if self.widget is not None:
             return self.widget.text
-        return None
+        return self._value

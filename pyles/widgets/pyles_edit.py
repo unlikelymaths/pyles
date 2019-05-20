@@ -13,17 +13,24 @@ from widgets.common import SingleLabel
 
 from widgets.util import widget_path
 
-Builder.load_file(widget_path('widgets/pyles_new.kv'))
+Builder.load_file(widget_path('widgets/pyles_edit.kv'))
 
 
-class PylesNew(BoxLayout):
+class PylesEdit(BoxLayout):
 
-    def __init__(self, **kwargs):
-        super(PylesNew, self).__init__(**kwargs)
+    def __init__(self, entry = None, **kwargs):
+        super(PylesEdit, self).__init__(**kwargs)
         self.app = App.get_running_app()
-        self.entry = None
-        self.on_linktypename(self.ids.linktype_selection.text)
+        self.entry = entry
         
+        if self.entry is None:
+            self.on_linktypename(self.ids.linktype_selection.text)
+        else:
+            self.linktypeconfig = self.entry.linktypeconfig
+            self.ids.name_input.text = self.entry.name
+            self.ids.image_widget.load_entry(self.entry)
+            self.build_settings()
+
     def on_back_button(self):
         self.app.set_widget('list')
         
@@ -40,8 +47,12 @@ class PylesNew(BoxLayout):
             print(e)
                 
     def on_linktypename(self, linktypename):
-        self.ids.linktype_settings.clear_widgets()
         self.linktypeconfig = linktype_manager.get_config(linktypename)
+        self.build_settings()
+        
+    def build_settings(self):
+        self.ids.linktype_settings.clear_widgets()
         for setting in self.linktypeconfig:
             self.ids.linktype_settings.add_widget(SingleLabel(text=setting.label))
             self.ids.linktype_settings.add_widget(setting.get_widget())
+        

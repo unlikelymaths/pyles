@@ -24,8 +24,12 @@ class EntryList():
         # Iterate all directories in MAINDIR
         entry_names = [dir for dir in listdir(MAINDIR) if path.isdir(path.join(MAINDIR,dir))]
         for name in entry_names:
-            entry = Entry(name)
-            self.entries.append(entry)
+            try:
+                entry = Entry(name)
+                self.entries.append(entry)
+            except Exception as e:
+                Logger.warning('Entry: Cannot load config of entry "{}".'.format(name))
+                raise e
                             
         # Remove all other links
         for link in listdir(LINKDIR):
@@ -111,7 +115,10 @@ class Entry():
         if not path.isfile(self.link_path):
             self.write_link()
             Logger.info('Entry: Created missing link for "{}"'.format(self.name))
-    
+        
+        # Try to load the linktype config
+        self.load_linktype()
+        
     def delete(self):
         # Remove directory
         rmtree(self.path)
@@ -136,6 +143,15 @@ class Entry():
         linktypeconfig_str = json.dumps(linktype)
         with open(self.linktypeconfig_path, 'w') as linktypeconfig_file:
             linktypeconfig_file.write(linktypeconfig_str)
+            
+    def load_linktype(self):
+        with open(self.linktypeconfig_path, 'r') as linktypeconfig_file:
+            linktypeconfig_str = linktypeconfig_file.readline()
+        linktype = json.loads(linktypeconfig_str)
+        self.linktypename = linktype['linktypename']
+        self.linktypeconfig = linktype_manager.deserialize(
+            linktype['linktypeconfig'])
+        
             
     def write_image(self, imagesection):
         imagesection.save_as(self.icon_path)

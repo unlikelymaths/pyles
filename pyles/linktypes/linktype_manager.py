@@ -19,3 +19,11 @@ def get_config(linktypename):
     
 def serialize(config):
     return [setting.serialize() for setting in config]
+    
+def deserialize(config_list):
+    config = []
+    for setting in config_list:
+        module = importlib.import_module(setting.pop('__module__'))
+        cls = getattr(module, setting.pop('__name__'))
+        config.append(cls(**setting))
+    return config

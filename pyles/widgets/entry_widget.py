@@ -21,4 +21,12 @@ class EntryWidget(BoxLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.app = App.get_running_app()
         self.ids.image_widget.load_entry(self.entry)
+        
+    def on_touch_down(self, touch):
+        if super().on_touch_down(touch):
+            return True
+        if self.collide_point(*touch.pos):
+            self.app.set_widget('edit', self.entry)
+            return True
