@@ -21,11 +21,16 @@ class PylesList(BoxLayout, KeyboardListener):
         # Set the height in order to allow scrolling
         self.ids.entry_widget.bind(minimum_height=self.ids.entry_widget.setter('height'))
         # Get the app
-        self.app = App.get_running_app()
-        # Load all entries in widgets
-        for entry in self.app.entry_list.entries:
+        self.entry_list = App.get_running_app().entry_list
+        self.entry_list.add_callback(self.reload_list)
+        self.reload_list(self.entry_list)
+        
+    def reload_list(self, entry_list):
+        self.ids.entry_widget.clear_widgets()
+        for entry in entry_list.entries:
             l = EntryWidget(entry=entry)
             self.ids.entry_widget.add_widget(l)
+        
         
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         print(keycode)

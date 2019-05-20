@@ -1,5 +1,6 @@
 import json
 from os import path, mkdir, listdir, remove
+from operator import attrgetter
 from shutil import rmtree
 from win32com.client import Dispatch
 from kivy.logger import Logger
@@ -12,8 +13,10 @@ class EntryException(ValueError):
     pass
 
 class EntryList():
+    _list = None
     
     def __init__(self):
+        self.callbacks = []
         self.entries = []
         self.load_entries()
         
@@ -30,10 +33,40 @@ class EntryList():
             if linkname not in entry_names:
                 remove(path.join(LINKDIR,link))
                 Logger.info('Entry: Removed orphaned link for "{}"'.format(linkname))
+
+    def add_callback(self, callback):
+        self.callbacks.append(callback)
+      
+    def remove_callback(self, callback):
+        if callback in self.callbacks:
+            self.callbacks.remove(callback) 
+
+    def notify(self):
+        for callback in self.callbacks:
+            callback(self)
+        
+    def add_entry(self, entry):
+        if entry is not None:
+            self.entries.append(entry)
+            self.sort_entries()
+            self.notify()
+
+    def remove_entry(self, entry):
+        if entry in self.entries:
+            self.entries.remove(entry)
+            self.notify()
             
+    def sort_entries(self):
+        self.entries.sort(key=attrgetter('name'))
+
+def get_entry_list():
+    if EntryList._list == None:
+        EntryList._list = EntryList()
+    return EntryList._list
     
 class Entry():
     def __init__(self, name, **kwargs):
+        self.image = None
         if len(kwargs) > 0:
             self.initialize_new(name, **kwargs)
         else:
@@ -69,9 +102,11 @@ class Entry():
         self.write_image(imagesection)
         self.write_link()
         
+        # Add to list
+        get_entry_list().add_entry(self)
+        
     def load(self, name):
         self.name = name
-        self.image = None
         
         # Check if the corresponding link exists. Otherwise create
         if not path.isfile(self.link_path):
@@ -83,6 +118,8 @@ class Entry():
         rmtree(self.path)
         # Remove link
         remove(self.link_path)
+        # Remove from list
+        get_entry_list().remove_entry(self)
     
     def write_vbs(self):
         vbs_str = self.linktype.get_vbs(self.linktypeconfig)
