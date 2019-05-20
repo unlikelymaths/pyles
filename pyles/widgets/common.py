@@ -19,6 +19,40 @@ class SingleTextinput(TextInput):
 class SingleSpinner(Spinner):
     pass
     
+class TreeAgnosticWidget(Widget):
+    """Provides callback on_tree when widget is added/removed from tree"""
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.bind(parent=self._ancestors_callback)
+        self._is_in_tree = None
+        self._ancestors = []
+
+    def _ancestors_callback(self, instance, value):
+        for ancestor in self._ancestors:
+            try:
+                ancestor.unbind(parent=self._ancestors_callback)
+            except ReferenceError:
+                pass
+        ancestor = self.parent
+        while isinstance(ancestor,Widget):
+            ancestor_ref = ancestor.proxy_ref
+            self._ancestors.append(ancestor_ref)
+            ancestor_ref.bind(parent=self._ancestors_callback)
+            ancestor = ancestor.parent
+            
+        if ancestor is None:
+            if self._is_in_tree != False:
+                self.on_tree(False)
+            self._is_in_tree = False
+        else:
+            if self._is_in_tree != True:
+                self.on_tree(True)
+            self._is_in_tree = True
+        
+    def on_tree(self, is_in_tree):
+        pass 
+    
 class DropManager():
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -44,31 +78,17 @@ class DropManager():
         for drop_widget in invalid_drop_widgets:
             self.remove_drop_widget(drop_widget)
         
-class DropWidget(Widget):
+class DropWidget(TreeAgnosticWidget):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.app = App.get_running_app()
-        self.bind(parent=self.parent_callback)
-        self.parents = []
 
-    def parent_callback(self, instance, value):
-        for parent in self.parents:
-            try:
-                parent.unbind(parent=self.parent_callback)
-            except ReferenceError:
-                pass
-        parent = self.parent
-        while isinstance(parent,Widget):
-            parent_ref = parent.proxy_ref
-            self.parents.append(parent_ref)
-            parent_ref.bind(parent=self.parent_callback)
-            parent = parent.parent
-            
-        if parent is None:
-            self.app.remove_drop_widget(self.proxy_ref)
-        else:
+    def on_tree(self, is_in_tree):
+        if is_in_tree:
             self.app.add_drop_widget(self.proxy_ref)
+        else:
+            self.app.remove_drop_widget(self.proxy_ref)
         
     def check_drop(self, file_path, mouse_pos):
         mouse_pos = self.to_widget(*mouse_pos)
