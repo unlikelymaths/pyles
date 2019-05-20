@@ -5,9 +5,12 @@ from widgets.pyles_list import PylesList
 from widgets.pyles_new import PylesNew
 from widgets.util import widget_path
 
+from data.entry import EntryList
+
 class Pyles(App,DropManager):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.entry_list = EntryList()
     
     def on_start(self):
         self.set_widget('list')

@@ -7,7 +7,6 @@ from kivy.clock import Clock
 from kivy.app import App
 
 from util import KeyboardListener
-from data.entry import EntryList
 
 from widgets.util import widget_path
 from widgets.entry_widget import EntryWidget
@@ -19,13 +18,14 @@ class PylesList(BoxLayout, KeyboardListener):
      
     def __init__(self, **kwargs):
         super(PylesList, self).__init__(**kwargs)
+        # Set the height in order to allow scrolling
         self.ids.entry_widget.bind(minimum_height=self.ids.entry_widget.setter('height'))
-        self.entry_list = EntryList()
-        for entry in self.entry_list.entries:
+        # Get the app
+        self.app = App.get_running_app()
+        # Load all entries in widgets
+        for entry in self.app.entry_list.entries:
             l = EntryWidget(entry=entry)
             self.ids.entry_widget.add_widget(l)
-        #self.app = App.get_running_app()
-        #print(self.app)
         
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         print(keycode)
