@@ -1,11 +1,12 @@
 from os.path import dirname
-from linktypes.type_settings import FilePathSetting
+from linktypes.type_settings import FilePathSetting, get_setting
 
 name = 'Default (exe)'
 
-config = [
-    FilePathSetting('path','Path'),
-    ]
+def config():
+    return [
+        FilePathSetting('path','Path'),
+        ]
     
 vbs_template = (
     'On Error Resume Next\n'
@@ -17,6 +18,7 @@ vbs_template = (
 
     
 def get_vbs(config):
-    path = config['path']
+    path_setting = get_setting(config,'path')
+    path = path_setting.value
     path_dir = dirname(path)
     return vbs_template.format(path=path, path_dir=path_dir)

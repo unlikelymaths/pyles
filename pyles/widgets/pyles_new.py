@@ -32,9 +32,7 @@ class PylesNew(BoxLayout):
         kwargs = {'name': self.ids.name_input.text,
             'linktypename': linktypename,
             'imagesection': self.ids.image_widget.imagesection,
-            'linktypeconfig': {
-                setting.key: setting.value 
-                for setting in linktype_manager.get_config(linktypename)}}
+            'linktypeconfig': self.linktypeconfig}
         
         try:
             self.entry = Entry(**kwargs)
@@ -43,6 +41,7 @@ class PylesNew(BoxLayout):
                 
     def on_linktypename(self, linktypename):
         self.ids.linktype_settings.clear_widgets()
-        for setting in linktype_manager.get_config(linktypename):
+        self.linktypeconfig = linktype_manager.get_config(linktypename)
+        for setting in self.linktypeconfig:
             self.ids.linktype_settings.add_widget(SingleLabel(text=setting.label))
             self.ids.linktype_settings.add_widget(setting.get_widget())

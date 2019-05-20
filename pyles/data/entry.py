@@ -77,7 +77,10 @@ class Entry():
         if len(name) == 0:
             raise EntryException('Name cannot be empty.')
         self.name = name
-            
+        
+        # Set linktype and config
+        self.linktypename = linktypename
+        self.linktypeconfig = linktypeconfig
             
         # Check if a link by that name already exists
         if path.isdir(self.path):
@@ -91,14 +94,10 @@ class Entry():
                 raise EntryException('Cannot create folder. The name is not valid.')
             raise e
         
-        # Set linktype and config
-        self.linktype = linktype_manager.all[linktypename]
-        self.linktypeconfig = linktypeconfig
-        
         # Write data
         self.write_vbs()
         self.write_manifest()
-        self.write_linktypeconfig()
+        self.write_linktype()
         self.write_image(imagesection)
         self.write_link()
         
@@ -131,8 +130,10 @@ class Entry():
         with open(self.manifest_path, 'w') as manifest_file:
             manifest_file.write(manifest_str)
             
-    def write_linktypeconfig(self):
-        linktypeconfig_str = json.dumps(self.linktypeconfig)
+    def write_linktype(self):
+        linktype = {'linktypename': self.linktypename,
+            'linktypeconfig': linktype_manager.serialize(self.linktypeconfig)}
+        linktypeconfig_str = json.dumps(linktype)
         with open(self.linktypeconfig_path, 'w') as linktypeconfig_file:
             linktypeconfig_file.write(linktypeconfig_str)
             
@@ -146,6 +147,10 @@ class Entry():
         link.IconLocation = self.ico_path
         link.WorkingDirectory = self.path
         link.save()
+        
+    @property
+    def linktype(self):
+        return linktype_manager.all[self.linktypename]
         
     @property
     def path(self):

@@ -12,7 +12,10 @@ all = {mod.name: mod for mod in [default] + [
 
 def get_config(linktypename):
     try:
-        config = all[linktypename].config
+        config = all[linktypename].config()
     except  AttributeError:
-        config = {}
+        config = []
     return config
+    
+def serialize(config):
+    return [setting.serialize() for setting in config]
