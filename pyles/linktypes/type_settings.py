@@ -24,14 +24,19 @@ class FilePathSetting(GenericSetting):
         super().__init__(*args, **kwargs)
         self._value = kwargs.get('value', '')
         
-    def get_widget(self):
+    def get_widget(self, callback):
         widget = FilePathTextInput(text = self._value)
         self.widget = weakref.proxy(widget)
+        if callback is not None:
+            self.widget.bind(text=callback)
         return widget
         
     def serialize(self):
         return {**super().serialize(),
             'value': self.value}
+            
+    def has_changed(self):
+        return self._value != self.value
         
     @property
     def value(self):

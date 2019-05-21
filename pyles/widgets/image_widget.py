@@ -1,5 +1,5 @@
 from kivy.graphics import Rectangle
-from kivy.properties import NumericProperty
+from kivy.properties import ObjectProperty
 from kivy.lang import Builder
 
 from widgets.common import DropWidget
@@ -13,10 +13,10 @@ from widgets.loading_widget import LoadingWidget
 Builder.load_file(widget_path('widgets/image_widget.kv'))
 
 class ImageWidget(DropWidget):
-
+    image = ObjectProperty()
+    
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.image = None
         self.imagesection = None
         self.bind(size=self.layout_callback)
         self.bind(pos=self.layout_callback)
