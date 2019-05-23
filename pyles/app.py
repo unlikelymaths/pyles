@@ -4,6 +4,7 @@ from widgets.common import DropManager
 from widgets.pyles_list import PylesList
 from widgets.pyles_edit import PylesEdit
 from widgets.util import widget_path
+from widgets.card_widget import CardWidget
 
 from data.entry import get_entry_list
 
