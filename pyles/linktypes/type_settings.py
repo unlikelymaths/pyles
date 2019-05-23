@@ -12,6 +12,9 @@ class GenericSetting():
         return {'__name__': self.__class__.__name__,
                 '__module__': self.__class__.__module__,
                 'key': self.key}
+                
+    def apply(self):
+        pass
 
 def get_setting(config, key):
     settings = [setting for setting in config if setting.key == key]
@@ -35,6 +38,9 @@ class FilePathSetting(GenericSetting):
         return {**super().serialize(),
             'value': self.value}
             
+    def apply(self):
+        self._value = self.value
+        
     def has_changed(self):
         return self._value != self.value
         

@@ -24,20 +24,14 @@ class PylesEdit(BoxLayout):
         self.entry = entry
         if self.entry is None:
             self.on_linktypename(self.ids.linktype_selection.text)
-        else:
-            self.linktypeconfig = self.entry.linktypeconfig
+        else: 
+            self.linktypeconfig = self.entry.linktypeconfig 
             self.ids.name_input.text = self.entry.name
             self.ids.image_widget.load_entry(self.entry)
             self.build_settings()
-        self._last_image_path = self.get_current_iamge_path()
         self.ids.name_input.bind(text=self.check_save_button)
-        self.ids.image_widget.bind(image=self.check_save_button)
+        self.ids.image_widget.bind(icon=self.check_save_button)
         self.check_save_button()
-    
-    def get_current_iamge_path(self):
-        if self.ids.image_widget.image is not None:
-            return self.ids.image_widget.image.filename
-        return None
     
     def has_changed(self):
         # Not editing an entry
@@ -49,17 +43,19 @@ class PylesEdit(BoxLayout):
             # Name has changed
             if self.ids.name_input.text != self.entry.name:
                 return True
+            # LinkType has changed
+            if self.linktypeconfig != self.entry.linktypeconfig:
+                return True
             # Setting has changed
             for setting in self.linktypeconfig:
                 if setting.has_changed():
                     return True
-            # Image has changed
-            if self._last_image_path != self.get_current_iamge_path():
+            # Icon has changed
+            if self.ids.image_widget.icon != self.entry.icon:
                 return True
         return False
     
     def check_save_button(self, *args, **kwargs):
-        print('check_save_button')
         self.ids.save_button.disabled = not self.has_changed()
             
     def on_back_button(self):
@@ -67,15 +63,27 @@ class PylesEdit(BoxLayout):
         
     def on_save_button(self):
         linktypename = self.ids.linktype_selection.text
-        kwargs = {'name': self.ids.name_input.text,
-            'linktypename': linktypename,
-            'imagesection': self.ids.image_widget.imagesection,
+        name = self.ids.name_input.text
+        kwargs = {'linktypename': linktypename,
+            'icon': self.ids.image_widget.icon,
             'linktypeconfig': self.linktypeconfig}
-        
-        try:
-            self.entry = Entry(**kwargs)
-        except EntryException as e:
-            print(e)
+        if self.entry is None:
+            try:
+                self.entry = Entry(name=name,**kwargs)
+            except EntryException as e:
+                print(e)
+        elif self.entry.name != name:
+            new_entry = None
+            try:
+                new_entry = Entry(name=name,**kwargs)
+            except EntryException as e:
+                print(e)
+            if new_entry is not None:
+                self.entry.delete()
+                self.entry = new_entry
+        else:
+            self.entry.save(**kwargs)
+        self.check_save_button()
                 
     def on_linktypename(self, linktypename):
         self.linktypeconfig = linktype_manager.get_config(linktypename)

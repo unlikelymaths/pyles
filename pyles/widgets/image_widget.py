@@ -12,7 +12,7 @@ from widgets.loading_widget import LoadingWidget
 Builder.load_file(widget_path('widgets/image_widget.kv'))
 
 class ImageWidget(DropWidget):
-    icon = ObjectProperty()
+    icon = ObjectProperty(allownone = True)
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -47,11 +47,12 @@ class ImageWidget(DropWidget):
         self.canvas.clear()
         self.clear_widgets()
         self.icon = entry.icon
-        if self.icon.state == Icon.READY:
-            self.on_state(self.icon, self.icon.state)
-        else:
-            self.icon.bind(state=self.on_state)
-            self.add_widget(LoadingWidget())
+        if self.icon is not None:
+            if self.icon.state == Icon.READY:
+                self.on_state(self.icon, self.icon.state)
+            else:
+                self.icon.bind(state=self.on_state)
+                self.add_widget(LoadingWidget())
     
     def load_file(self, file_path):
         self.canvas.clear()

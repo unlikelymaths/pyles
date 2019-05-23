@@ -10,6 +10,7 @@ class Image():
         self._arr = None
         self._bytes = None
         self._texture = None
+        self._mode = 'RGB'
         self.size = None
         self.aspect_ratio = None
         self.load_image(filename)
@@ -18,7 +19,7 @@ class Image():
         try:
         #Load image file
             pil_image = PIL.Image.open(filename)
-            pil_image = pil_image.convert('RGB')
+            pil_image = pil_image.convert(self._mode)
             # Get rawdata from image
             self._bytes = pil_image.tobytes()
             buf = pil_image.getdata()
@@ -32,9 +33,12 @@ class Image():
             self._arr = None
             raise ImageLoadError('Cannot open image "{}".'.format(filename))
     
+    def save(self, file_path):
+        self.image.save(file_path)
+    
     @property
     def image(self):
-        return PIL.Image.frombytes(self._bytes)
+        return PIL.Image.frombytes(self._mode, self.size, self._bytes)
     
     @property
     def texture(self):

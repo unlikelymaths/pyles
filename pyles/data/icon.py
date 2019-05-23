@@ -1,6 +1,9 @@
 import multiprocessing
 import pickle
+import json
+import importlib
 from abc import ABC, abstractmethod
+from os.path import join
 from kivy.clock import Clock
 from kivy.event import EventDispatcher
 from kivy.properties import NumericProperty
@@ -11,6 +14,9 @@ from data.image import Image, ImageLoadError
 class IconLoadError(IOError):
     pass
 
+def _info_path(dir_path):
+    return join(dir_path, 'info.json')
+    
 class Icon(ABC, EventDispatcher):
     EMPTY = 0
     LOADING = 1
@@ -19,8 +25,9 @@ class Icon(ABC, EventDispatcher):
     MODIFIED = 4
     state = NumericProperty(EMPTY)
     
-    def __init__(self):
+    def __init__(self, dir_path = None):
         super().__init__()
+        self.dir_path = dir_path
         self._queue = None
         self._loader = None
         Clock.schedule_once(lambda dt: self.load())
@@ -53,11 +60,24 @@ class Icon(ABC, EventDispatcher):
                 self.state = Icon.READY
             else:
                 self.state = Icon.FAILED
-    
-    def save(self, name):
-        """Saves the icon as icons and its raw data"""
+        
+    def save_as(self, file_path):
+        """Saves the icon as image to file file_path"""
+        self.get_image().save(file_path)
+        
+    def save(self, dir_path):
+        data = {'__name__': self.__class__.__name__,
+                '__module__': self.__class__.__module__}
+        file_path = _info_path(dir_path)
+        with open(file_path, 'w') as file:
+            json.dump(data,file)
+        self.save_data(dir_path)
+            
+    @abstractmethod
+    def save_data(self, dir_path):
+        """Saves the icons raw data to directory dir_path"""
         pass
-    
+        
     @abstractmethod
     def arguments(self):
         """Iterable or dict of arguments passed to load_data"""
@@ -85,8 +105,8 @@ class Icon(ABC, EventDispatcher):
     
 # Loads an image and that's it
 class ImageIcon(Icon):
-    def __init__(self, from_file_path):
-        super().__init__()
+    def __init__(self, *args, from_file_path = None, **kwargs):
+        super().__init__(*args, **kwargs)
         self._from_file_path = from_file_path
         self._image = None
         
@@ -126,7 +146,16 @@ class QuadraticIcon(ImageIcon):
         self._texture_coordinates = None
         self._relpos = None
         self._relsize = None
-       
+    
+    def save_data(self, dir_path):
+        if self._image is not None:
+            self._image.save(join(dir_path, 'original.png'))
+        
+    def arguments(self):
+        if self.dir_path is not None:
+            return (join(self.dir_path, 'original.png'),)
+        return super().arguments()
+        
     def copy_queue(self, queue):
         super().copy_queue(queue)
         if self._image is not None:
@@ -137,6 +166,26 @@ class QuadraticIcon(ImageIcon):
             return True
         return False
         
+    def draw(self, pos, size):
+        if self._image is not None:
+            aspect_ratio = size[0] / size[1]
+            image_aspect_ration = 1
+            if aspect_ratio > image_aspect_ration:
+                draw_size = (size[1]* image_aspect_ration, size[1])
+                draw_pos = (pos[0] + size[0]/2 - draw_size[0]/2, pos[1])
+            else:
+                draw_size = (size[0], size[0] / image_aspect_ration)
+                draw_pos = (pos[0], pos[1] + size[1]/2 - draw_size[1]/2)
+            Rectangle(texture=self._image.texture, pos=draw_pos, size=draw_size,
+                tex_coords = self.texture_coordinates)
+             
+    def get_image(self):
+        return self._image.image.crop(
+            (self.texture_pos[0], 
+             self.texture_pos[1], 
+             self.texture_pos[0] + self.texture_size[0], 
+             self.texture_pos[1] + self.texture_size[1]))
+             
     @property
     def texture_coordinates(self):
         if self._texture_coordinates is None and self._image is not None:
@@ -163,31 +212,18 @@ class QuadraticIcon(ImageIcon):
             self._relsize = (self.texture_size[0] / self._image.size[0], 
                              self.texture_size[1] / self._image.size[1])
         return self._relsize
-            
-    def get_image(self):
-        pass
-        #image_section = self.image.image.crop(
-        #    (self.pos[0], 
-        #     self.pos[1], 
-        #     self.pos[0] + self.size[0], 
-        #     self.pos[1] + self.size[1]))
-        #image_section.save(file_path)
-        
-    def draw(self, pos, size):
-        if self._image is not None:
-            aspect_ratio = size[0] / size[1]
-            image_aspect_ration = self._image.aspect_ratio
-            if aspect_ratio > image_aspect_ration:
-                draw_size = (size[1]* image_aspect_ration, size[1])
-                draw_pos = (pos[0] + size[0]/2 - size[0]/2, pos[1])
-            else:
-                draw_size = (size[0], size[0] / image_aspect_ration)
-                draw_pos = (pos[0], pos[1] + size[1]/2 - size[1]/2)
-            Rectangle(texture=self._image.texture, pos=pos, size=size,
-                tex_coords = self.texture_coordinates)
- 
+
 # Default for drag n drop action
 def from_file(file_path, quadtratic = False):
     """Load a QuadraticIcon from a single image file"""
     icon = QuadraticIcon(from_file_path = file_path)
     return icon
+    
+def from_save(dir_path):
+    file_path = _info_path(dir_path)
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    module = importlib.import_module(data['__module__'])
+    cls = getattr(module, data['__name__'])
+    return cls(dir_path=dir_path)
+    return None

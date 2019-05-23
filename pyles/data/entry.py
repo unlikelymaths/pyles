@@ -8,7 +8,7 @@ from kivy.logger import Logger
 from linktypes import linktype_manager
 from data.paths import MAINDIR, LINKDIR
 from data.manifest import get_manifest
-from data.icon import from_file
+from data.icon import from_save
 
 class EntryException(ValueError):
     pass
@@ -51,7 +51,7 @@ class EntryList():
             callback(self)
         
     def add_entry(self, entry):
-        if entry is not None:
+        if entry is not None and entry not in self.entries:
             self.entries.append(entry)
             self.sort_entries()
             self.notify()
@@ -77,13 +77,14 @@ class Entry():
         else:
             self.load(name)
             
-    def initialize_new(self, name, imagesection, linktypename, linktypeconfig):
+    def initialize_new(self, name, icon, linktypename, linktypeconfig):
         # Check if name is not empty
         if len(name) == 0:
             raise EntryException('Name cannot be empty.')
         self.name = name
         
-        # Set linktype and config
+        # Set members
+        self._icon = icon
         self.linktypename = linktypename
         self.linktypeconfig = linktypeconfig
             
@@ -94,6 +95,7 @@ class Entry():
         # Create a directory
         try:
             mkdir(self.path)
+            mkdir(self.full_icon_path)
         except OSError as e:
             if e.winerror == 123:
                 raise EntryException('Cannot create folder. The name is not valid.')
@@ -103,12 +105,25 @@ class Entry():
         self.write_vbs()
         self.write_manifest()
         self.write_linktype()
-        self.write_image(imagesection)
+        self.write_icon()
         self.write_link()
         
         # Add to list
         get_entry_list().add_entry(self)
         
+    def save(self, icon, linktypename, linktypeconfig):
+        # Set members
+        self._icon = icon
+        self.linktypename = linktypename
+        self.linktypeconfig = linktypeconfig
+        
+        # Write data
+        self.write_vbs()
+        self.write_manifest()
+        self.write_linktype()
+        self.write_icon()
+        self.write_link()
+            
     def load(self, name):
         self.name = name
         
@@ -144,6 +159,7 @@ class Entry():
         linktypeconfig_str = json.dumps(linktype)
         with open(self.linktypeconfig_path, 'w') as linktypeconfig_file:
             linktypeconfig_file.write(linktypeconfig_str)
+        linktype_manager.apply(self.linktypeconfig)
             
     def load_linktype(self):
         with open(self.linktypeconfig_path, 'r') as linktypeconfig_file:
@@ -154,9 +170,11 @@ class Entry():
             linktype['linktypeconfig'])
         
             
-    def write_image(self, imagesection):
-        imagesection.save_as(self.icon_path)
-        imagesection.save_as(self.ico_path)
+    def write_icon(self):
+        if self._icon is not None:
+            self._icon.save(self.full_icon_path)
+            self._icon.save_as(self.icon_path)
+            self._icon.save_as(self.ico_path)
         
     def write_link(self):
         link = Dispatch('WScript.Shell').CreateShortCut(self.link_path)
@@ -168,7 +186,10 @@ class Entry():
     @property
     def icon(self):
         if self._icon is None:
-            self._icon = from_file(self.icon_path)
+            try:
+                self._icon = from_save(self.full_icon_path)
+            except:
+                pass
         return self._icon
         
     @property
@@ -190,6 +211,10 @@ class Entry():
     @property
     def linktypeconfig_path(self):
         return path.join(self.path, 'linktypeconfig.json')
+        
+    @property
+    def full_icon_path(self):
+        return path.join(self.path, 'icon')
         
     @property
     def icon_path(self):

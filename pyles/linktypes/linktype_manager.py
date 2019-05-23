@@ -20,6 +20,10 @@ def get_config(linktypename):
 def serialize(config):
     return [setting.serialize() for setting in config]
     
+def apply(config):
+    for setting in config:
+        setting.apply()
+    
 def deserialize(config_list):
     config = []
     for setting in config_list:
