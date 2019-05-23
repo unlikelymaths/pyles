@@ -29,9 +29,7 @@ class LoadingWidget(Widget):
         
     def load_image(self):
         if LoadingWidget._image is None:
-            LoadingWidget._image = Image(loading_path, 
-                load_async = False,
-                load_now = True)
+            LoadingWidget._image = Image(loading_path)
         
     def on_parent(self, *args):
         # Remove from previous parent

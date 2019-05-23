@@ -33,9 +33,7 @@ class CardWidget(Widget):
         
     def load_image(self):
         if CardWidget._image is None:
-            CardWidget._image = Image(card_path, 
-                load_async = False,
-                load_now = True)
+            CardWidget._image = Image(card_path)
 
     def layout_callback(self, instance, value):
         self.positions = [

@@ -8,6 +8,7 @@ from kivy.logger import Logger
 from linktypes import linktype_manager
 from data.paths import MAINDIR, LINKDIR
 from data.manifest import get_manifest
+from data.icon import from_file
 
 class EntryException(ValueError):
     pass
@@ -70,7 +71,7 @@ def get_entry_list():
     
 class Entry():
     def __init__(self, name, **kwargs):
-        self.image = None
+        self._icon = None
         if len(kwargs) > 0:
             self.initialize_new(name, **kwargs)
         else:
@@ -163,6 +164,12 @@ class Entry():
         link.IconLocation = self.ico_path
         link.WorkingDirectory = self.path
         link.save()
+        
+    @property
+    def icon(self):
+        if self._icon is None:
+            self._icon = from_file(self.icon_path)
+        return self._icon
         
     @property
     def linktype(self):
