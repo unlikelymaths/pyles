@@ -65,6 +65,9 @@ class EntryList():
     def sort_entries(self):
         self.entries.sort(key=attrgetter('name'))
 
+    def __len__(self):
+        return len(self.entries)
+
 def get_entry_list():
     if EntryList._list == None:
         EntryList._list = EntryList()
