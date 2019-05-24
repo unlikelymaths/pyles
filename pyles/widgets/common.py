@@ -7,6 +7,7 @@ from kivy.uix.spinner import Spinner, SpinnerOption
 from kivy.lang import Builder
 
 from widgets.util import widget_path
+import widgets.definitions
 
 Builder.load_file(widget_path('widgets/common.kv'))
 

@@ -1,6 +1,7 @@
 #:kivy 1.0
 
 #:import SingleLabel widgets.common.SingleLabel
+#:import color widgets.definitions.color
 
 <PylesList>:
     size_hint_x: 1
@@ -10,6 +11,14 @@
         size_hint_y: None
         height: 30
         orientation: 'horizontal'
+
+        canvas.before:
+            Color:
+                rgba: color['secondary-background']
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
         Label:
             size_hint_x: 1
             text: 'Pyles'
@@ -26,5 +35,3 @@
             spacing: [10,10]
             size_hint_x: 1
             size_hint_y: None
-    SingleLabel:
-        text: ''

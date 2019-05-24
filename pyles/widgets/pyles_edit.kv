@@ -5,6 +5,7 @@
 #:import SingleLabel widgets.common.SingleLabel
 #:import SingleTextinput widgets.common.SingleTextinput
 #:import SingleSpinner widgets.common.SingleSpinner
+#:import color widgets.definitions.color
 
 #:set left_column 0.3
 
@@ -16,6 +17,14 @@
         size_hint_y: None
         height: 30
         orientation: 'horizontal'
+
+        canvas.before:
+            Color:
+                rgba: color['secondary-background']
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
         Button:
             size_hint_x: None
             text: 'Back'
