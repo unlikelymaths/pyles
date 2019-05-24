@@ -3,7 +3,7 @@ from kivy.core.window import Window
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
-from kivy.uix.spinner import Spinner
+from kivy.uix.spinner import Spinner, SpinnerOption
 from kivy.lang import Builder
 
 from widgets.util import widget_path
@@ -15,9 +15,15 @@ class SingleLabel(Label):
     
 class SingleTextinput(TextInput):
     pass
+
+class SingleSpinnerOption(SpinnerOption):
+    pass
     
 class SingleSpinner(Spinner):
-    pass
+    def __init__(self, **kwargs):
+        super().__init__(option_cls = SingleSpinnerOption, **kwargs)
+    
+
     
 class TreeAgnosticWidget(Widget):
     """Provides callback on_tree when widget is added/removed from tree"""
@@ -103,3 +109,6 @@ class DropWidget(TreeAgnosticWidget):
 class FilePathTextInput(SingleTextinput, DropWidget):
     def drop(self, file_path):
         self.text = file_path
+
+class SpinnerInput(SingleSpinner):
+    pass

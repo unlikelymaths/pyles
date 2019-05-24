@@ -2,13 +2,20 @@ import importlib
 import pkgutil
 
 import linktypes.default_linktype as default
+import linktypes.pylesltype_steam as steam
 
-all = {mod.name: mod for mod in [default] + [
-    importlib.import_module('linktypes.{}'.format(name))
-    for finder, name, ispkg
-    in pkgutil.iter_modules(path=['pyles\linktypes'])
-    if name.startswith('pylesltype_')
-    ]}
+all = {default.name: default,
+    steam.name: steam}
+for finder, name, ispkg in pkgutil.iter_modules(path=['pyles\linktypes']):
+    print(name)
+    if not name.startswith('pylesltype_'):
+        continue
+    mod = importlib.import_module('linktypes.{}'.format(name))
+    if not mod.active:
+        continue
+    if mod.name in all:
+        continue
+    all[mod.name] = mod
 
 def get_config(linktypename):
     try:

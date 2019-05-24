@@ -29,7 +29,8 @@ class EntryList():
                 entry = Entry(name)
                 self.entries.append(entry)
             except Exception as e:
-                Logger.warning('Entry: Cannot load config of entry "{}".'.format(name))
+                #rmtree(path.join(MAINDIR,name))
+                #Logger.warning('Entry: Removed broken entry "{}".'.format(name))
                 raise e
                             
         # Remove all other links

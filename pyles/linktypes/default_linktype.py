@@ -1,6 +1,7 @@
 from os.path import dirname
 from linktypes.type_settings import FilePathSetting, get_setting
 
+active = True
 name = 'Default (exe)'
 
 def config():
@@ -11,10 +12,10 @@ def config():
 vbs_template = (
     'On Error Resume Next\n'
     'Set shell = CreateObject("Wscript.Shell")\n'
-    'appPath = "{path}"\n'
+    'appPath = """{path}"""\n'
     'appPathDir = "{path_dir}"\n'
     'shell.CurrentDirectory = appPathDir\n'
-    'shell.Run(appPath)')
+    'shell.Run appPath')
 
     
 def get_vbs(config):
