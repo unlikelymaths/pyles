@@ -7,7 +7,6 @@ import linktypes.pylesltype_steam as steam
 all = {default.name: default,
     steam.name: steam}
 for finder, name, ispkg in pkgutil.iter_modules(path=['pyles\linktypes']):
-    print(name)
     if not name.startswith('pylesltype_'):
         continue
     mod = importlib.import_module('linktypes.{}'.format(name))
