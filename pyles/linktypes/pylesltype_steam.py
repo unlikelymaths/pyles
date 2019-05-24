@@ -1,4 +1,5 @@
 import re
+from operator import itemgetter
 from os import path, mkdir, listdir, remove
 from kivy.logger import Logger
 
@@ -65,6 +66,7 @@ def read_manifests(appdirs):
             name = parse_manifest(appdir, file)
             if id is not None and name is not None:
                 games.append({'id': id, 'name': name})
+    games.sort(key=itemgetter('name'))
     return games
 
 if active:
