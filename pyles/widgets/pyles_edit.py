@@ -10,6 +10,7 @@ from util import KeyboardListener
 from data.entry import Entry, EntryException
 from linktypes import linktype_manager
 from widgets.common import SingleLabel
+from widgets.status_bar import status
 
 from widgets.util import widget_path
 
@@ -29,9 +30,6 @@ class PylesEdit(BoxLayout):
             self.ids.name_input.text = self.entry.name
             self.ids.image_widget.load_entry(self.entry)
             self.build_settings()
-        self.ids.name_input.bind(text=self.check_save_button)
-        self.ids.image_widget.bind(icon=self.check_save_button)
-        self.check_save_button()
     
     def has_changed(self):
         # Not editing an entry
@@ -54,37 +52,47 @@ class PylesEdit(BoxLayout):
             if self.ids.image_widget.icon != self.entry.icon:
                 return True
         return False
-    
-    def check_save_button(self, *args, **kwargs):
-        self.ids.save_button.disabled = not self.has_changed()
-            
+
     def on_back_button(self):
         self.app.set_widget('list')
         
     def on_save_button(self):
+        if len(self.ids.name_input.text) == 0:
+            status.message('Name must not be empty', weak=True)
+            return
+        if not self.has_changed():
+            status.message('No changes to write', weak=True)
+            return
         linktypename = self.ids.linktype_selection.text
         name = self.ids.name_input.text
         kwargs = {'linktypename': linktypename,
             'icon': self.ids.image_widget.icon,
             'linktypeconfig': self.linktypeconfig}
         if self.entry is None:
+            status.message('Saving new entry {}'.format(name), weak=True)
             try:
                 self.entry = Entry(name=name,**kwargs)
+                status.message('Saved new entry {}'.format(name), weak=True)
             except EntryException as e:
-                print(e)
+                status.error(e)
         elif self.entry.name != name:
-            new_entry = None
+            status.message('Saving entry {}'.format(name), weak=True)
             try:
                 new_entry = Entry(name=name,**kwargs)
+                if new_entry is not None:
+                    self.entry.delete()
+                    self.entry = new_entry
+                status.message('Saved entry {}'.format(name), weak=True)
             except EntryException as e:
-                print(e)
-            if new_entry is not None:
-                self.entry.delete()
-                self.entry = new_entry
+                status.error(e)
         else:
-            self.entry.save(**kwargs)
-        self.check_save_button()
-                
+            status.message('Saving entry {}'.format(name), weak=True)
+            try:
+                self.entry.save(**kwargs)
+                status.message('Saved entry {}'.format(name), weak=True)
+            except EntryException as e:
+                status.error(e)
+
     def on_linktypename(self, linktypename):
         self.linktypeconfig = linktype_manager.get_config(linktypename)
         self.build_settings()
@@ -95,5 +103,5 @@ class PylesEdit(BoxLayout):
             self.ids.linktype_settings.add_widget(
                 SingleLabel(text=setting.label))
             self.ids.linktype_settings.add_widget(
-                setting.get_widget(self.check_save_button))
+                setting.get_widget())
             

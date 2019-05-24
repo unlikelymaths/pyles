@@ -18,7 +18,7 @@ Message = namedtuple('Message', ['text','duration','type','weak'])
 def get_caller():
     frm = inspect.stack()[2]
     mod = inspect.getmodule(frm[0])
-    return mod.__name__
+    return mod.__name__.split('.')[-1]
 
 class StatusManager():
     DEFAULT_INFO_DURATION = 5
@@ -30,13 +30,24 @@ class StatusManager():
         self.error_stack = []
         self.message_stack = []
 
-    def message(self, text, duration = DEFAULT_INFO_DURATION, weak = False):
+    def message(self, text, duration = DEFAULT_INFO_DURATION, weak = True):
+        text = str(text)
         Logger.info('{}: {}'.format(get_caller(), text))
         self.message_stack.append(Message(
             text = text,
             duration = duration,
             type = 'message',
             weak = weak))
+        self._update()
+
+    def error(self, text, duration = DEFAULT_INFO_DURATION):
+        text = str(text)
+        Logger.info('{}: {}'.format(get_caller(), text))
+        self.error_stack.append(Message(
+            text = text,
+            duration = duration,
+            type = 'error',
+            weak = False))
         self._update()
 
     def _show_current_message(self):
@@ -67,6 +78,8 @@ class StatusManager():
                 self.current_timer.cancel()
             self.current_message = None
             self.current_timer = None
+        while len(self.message_stack) > 1 and self.message_stack[0].weak==True:
+            self.message_stack.pop(0)
 
     def _update(self):
         self._prune_weak()

@@ -27,7 +27,7 @@ class FilePathSetting(GenericSetting):
         super().__init__(key, label, **kwargs)
         self._value = kwargs.get('value', '')
         
-    def get_widget(self, callback):
+    def get_widget(self, callback = None):
         widget = FilePathTextInput(text = self._value)
         self.widget = weakref.proxy(widget)
         if callback is not None:
@@ -56,7 +56,7 @@ class MultipleChoiceSetting(GenericSetting):
         self._value = kwargs.get('value', options[0])
         self._options = options
         
-    def get_widget(self, callback):
+    def get_widget(self, callback = None):
         widget = SpinnerInput(text = self._value,
             values = self._options)
         self.widget = weakref.proxy(widget)

@@ -141,9 +141,19 @@ class Entry():
         
     def delete(self):
         # Remove directory
-        rmtree(self.path)
+        try:
+            rmtree(self.path)
+        except OSError:
+            text = 'Cannot delete data directory of entry {}'.format(self.name)
+            Logger.exception('entry: {}'.format(text))
+            raise EntryException(text)
         # Remove link
-        remove(self.link_path)
+        try:
+            remove(self.link_path)
+        except OSError:
+            text = 'Cannot delete link of entry {}'.format(self.name)
+            Logger.exception('entry: {}'.format(text))
+            raise EntryException(text)
         # Remove from list
         get_entry_list().remove_entry(self)
     

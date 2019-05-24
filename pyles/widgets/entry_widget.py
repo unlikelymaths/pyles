@@ -10,6 +10,7 @@ from util import KeyboardListener
 from data.entry import Entry, EntryException
 from linktypes import linktype_manager
 from widgets.common import SingleLabel
+from widgets.status_bar import status
 
 from widgets.util import widget_path
 
@@ -30,3 +31,15 @@ class EntryWidget(BoxLayout):
         if self.collide_point(*touch.pos):
             self.app.set_widget('edit', self.entry)
             return True
+
+    def on_delete(self):
+        if self.entry is not None:
+            name = self.entry.name
+            text = 'Deleting entry {}'.format(name)
+            status.message(text, weak=True)
+            try:
+                self.entry.delete()
+                text = 'Deleted entry {}'.format(name)
+                status.message(text, weak=True)
+            except EntryException as e:
+                status.error(e)
