@@ -1,4 +1,16 @@
 #:kivy 1.0
 
+#:import StatusBar widgets.status_bar.StatusBar
+
 BoxLayout:
     orientation: 'vertical'
+    content: content
+    status: status
+    BoxLayout:
+        id: content
+        orientation: 'vertical'
+        size_hint_x: 1
+        size_hint_y: 1
+    StatusBar:
+        id: status
+        text: 'Test'

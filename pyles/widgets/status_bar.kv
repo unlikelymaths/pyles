@@ -1,0 +1,44 @@
+#:kivy 1.0
+
+#:import SingleLabel widgets.common.SingleLabel
+#:import color widgets.definitions.color
+
+#:set margin_top 5
+#:set margin_bottom 5
+#:set margin_left 10
+#:set margin_right 10
+#:set height 20
+
+<StatusBar>:
+    size_hint_x: 1
+    size_hint_y: None
+    height: margin_top + height + margin_bottom
+    orientation: 'vertical'
+    
+    canvas.before:
+        Color:
+            rgba: color['secondary-background']
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    
+    Widget:
+        size_hint_y: None
+        height: margin_top
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: height
+        Widget:
+            size_hint_x: None
+            width: margin_left
+        SingleLabel:
+            text: root.status
+            color: root.color
+        Widget:
+        Widget:
+            size_hint_x: None
+            width: margin_right
+    Widget:
+        size_hint_y: None
+        height: margin_bottom
