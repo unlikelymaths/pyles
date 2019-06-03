@@ -18,7 +18,9 @@ Message = namedtuple('Message', ['text','duration','type','weak'])
 def get_caller():
     frm = inspect.stack()[2]
     mod = inspect.getmodule(frm[0])
-    return mod.__name__.split('.')[-1]
+    if mod:
+        return mod.__name__.split('.')[-1]
+    return 'Pyles'
 
 class StatusManager():
     DEFAULT_INFO_DURATION = 5
