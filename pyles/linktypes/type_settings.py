@@ -1,7 +1,10 @@
 import weakref
 import importlib
 from widgets.common import FilePathTextInput, SpinnerInput
- 
+
+class LinktypeException(Exception):
+    pass
+
 class GenericSetting():
     def __init__(self, key, label, **kwargs):
         self.key = key

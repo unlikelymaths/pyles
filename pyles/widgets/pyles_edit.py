@@ -9,6 +9,7 @@ from kivy.app import App
 from util import KeyboardListener
 from data.entry import Entry, EntryException
 from linktypes import linktype_manager
+from linktypes.type_settings import LinktypeException
 from widgets.common import SingleLabel
 from widgets.status_bar import status
 
@@ -73,7 +74,7 @@ class PylesEdit(BoxLayout):
             try:
                 self.entry = Entry(name=name,**kwargs)
                 status.message('Saved new entry {}'.format(name), weak=True)
-            except EntryException as e:
+            except (EntryException, LinktypeException) as e:
                 status.error(e)
         elif self.entry.name != name:
             status.message('Saving entry {}'.format(name), weak=True)
@@ -83,14 +84,14 @@ class PylesEdit(BoxLayout):
                     self.entry.delete()
                     self.entry = new_entry
                 status.message('Saved entry {}'.format(name), weak=True)
-            except EntryException as e:
+            except (EntryException, LinktypeException) as e:
                 status.error(e)
         else:
             status.message('Saving entry {}'.format(name), weak=True)
             try:
                 self.entry.save(**kwargs)
                 status.message('Saved entry {}'.format(name), weak=True)
-            except EntryException as e:
+            except (EntryException, LinktypeException) as e:
                 status.error(e)
 
     def on_linktypename(self, linktypename):
