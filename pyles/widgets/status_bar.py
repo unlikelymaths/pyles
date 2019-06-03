@@ -44,7 +44,7 @@ class StatusManager():
 
     def error(self, text, duration = DEFAULT_INFO_DURATION):
         text = str(text)
-        Logger.info('{}: {}'.format(get_caller(), text))
+        Logger.error('{}: {}'.format(get_caller(), text))
         self.error_stack.append(Message(
             text = text,
             duration = duration,

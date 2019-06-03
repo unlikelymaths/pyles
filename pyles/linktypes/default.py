@@ -8,6 +8,8 @@ defaults = {'path': {}}
 
 def settings(values=None):
     values = values or defaults
+    if 'path' not in values:
+        raise LinktypeException('Missing setting "path"')
     return {'path': FilePathSetting('Path', **values['path'])}
     
 vbs_file_template = (

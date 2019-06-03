@@ -9,6 +9,8 @@ from linktypes import manager
 from data.paths import MAINDIR, LINKDIR
 from data.manifest import get_manifest
 from data.icon import from_save
+from widgets.status_bar import status
+from linktypes.settings import LinktypeException
 
 class EntryException(ValueError):
     pass
@@ -28,11 +30,9 @@ class EntryList():
             try:
                 entry = Entry(name)
                 self.entries.append(entry)
-            except Exception as e:
-                #rmtree(path.join(MAINDIR,name))
-                #Logger.warning('Entry: Removed broken entry "{}".'.format(name))
-                raise e
-                            
+            except EntryException as e:
+                status.error(e)
+
         # Remove all other links
         for link in listdir(LINKDIR):
             linkname = link.split('.')[0]
@@ -172,9 +172,18 @@ class Entry():
         manager.apply(self.linktypeconfig)
             
     def load_linktype(self):
-        with open(self.linktypeconfig_path, 'r') as linktypeconfig_file:
-            linktypeconfig_str = linktypeconfig_file.readline()
-        self.linktypeconfig = manager.deserialize(json.loads(linktypeconfig_str))
+        try:
+            with open(self.linktypeconfig_path, 'r') as linktypeconfig_file:
+                linktypeconfig_str = linktypeconfig_file.readline()
+        except FileNotFoundError:
+            raise EntryException('Missing linktypeconfig file for entry {}.'
+                .format(self.name))
+        try:
+            self.linktypeconfig = manager.deserialize(
+                json.loads(linktypeconfig_str))
+        except LinktypeException as e:
+            raise EntryException('Cannot load linktypeconfig for entry {}: {}'
+                .format(self.name, e))
         
             
     def write_icon(self):
