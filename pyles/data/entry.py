@@ -5,7 +5,7 @@ from shutil import rmtree
 from win32com.client import Dispatch
 from kivy.logger import Logger
 
-from linktypes import linktype_manager
+from linktypes import manager
 from data.paths import MAINDIR, LINKDIR
 from data.manifest import get_manifest
 from data.icon import from_save
@@ -81,7 +81,7 @@ class Entry():
         else:
             self.load(name)
             
-    def initialize_new(self, name, icon, linktypename, linktypeconfig):
+    def initialize_new(self, name, icon, linktypeconfig):
         # Check if name is not empty
         if len(name) == 0:
             raise EntryException('Name cannot be empty.')
@@ -89,7 +89,6 @@ class Entry():
         
         # Set members
         self._icon = icon
-        self.linktypename = linktypename
         self.linktypeconfig = linktypeconfig
             
         # Check if a link by that name already exists
@@ -115,10 +114,9 @@ class Entry():
         # Add to list
         get_entry_list().add_entry(self)
         
-    def save(self, icon, linktypename, linktypeconfig):
+    def save(self, icon, linktypeconfig):
         # Set members
         self._icon = icon
-        self.linktypename = linktypename
         self.linktypeconfig = linktypeconfig
         
         # Write data
@@ -168,20 +166,15 @@ class Entry():
             manifest_file.write(manifest_str)
             
     def write_linktype(self):
-        linktype = {'linktypename': self.linktypename,
-            'linktypeconfig': linktype_manager.serialize(self.linktypeconfig)}
-        linktypeconfig_str = json.dumps(linktype)
+        linktypeconfig_str = json.dumps(manager.serialize(self.linktypeconfig))
         with open(self.linktypeconfig_path, 'w') as linktypeconfig_file:
             linktypeconfig_file.write(linktypeconfig_str)
-        linktype_manager.apply(self.linktypeconfig)
+        manager.apply(self.linktypeconfig)
             
     def load_linktype(self):
         with open(self.linktypeconfig_path, 'r') as linktypeconfig_file:
             linktypeconfig_str = linktypeconfig_file.readline()
-        linktype = json.loads(linktypeconfig_str)
-        self.linktypename = linktype['linktypename']
-        self.linktypeconfig = linktype_manager.deserialize(
-            linktype['linktypeconfig'])
+        self.linktypeconfig = manager.deserialize(json.loads(linktypeconfig_str))
         
             
     def write_icon(self):
@@ -208,7 +201,7 @@ class Entry():
         
     @property
     def linktype(self):
-        return linktype_manager.all[self.linktypename]
+        return self.linktypeconfig['linktype']
         
     @property
     def path(self):

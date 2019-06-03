@@ -1,6 +1,6 @@
 #:kivy 1.0
 
-#:import linktype_manager linktypes.linktype_manager
+#:import manager linktypes.manager
 #:import ImageWidget widgets.image_widget.ImageWidget
 #:import SingleLabel widgets.common.SingleLabel
 #:import SingleTextinput widgets.common.SingleTextinput
@@ -61,8 +61,8 @@
                 SingleSpinner:
                     size_hint_x: 1-left_column
                     id: linktype_selection
-                    text: linktype_manager.default.name
-                    values: linktype_manager.all.keys()
+                    text: manager.default.name
+                    values: manager.all.keys()
                     on_text: root.on_linktypename(self.text)
             GridLayout:
                 cols: 1

@@ -8,7 +8,6 @@ from kivy.app import App
 
 from util import KeyboardListener
 from data.entry import Entry, EntryException
-from linktypes import linktype_manager
 from widgets.common import SingleLabel
 from widgets.status_bar import status
 

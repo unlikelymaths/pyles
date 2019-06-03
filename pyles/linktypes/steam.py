@@ -3,9 +3,11 @@ from operator import itemgetter
 from os import path, mkdir, listdir, remove
 from kivy.logger import Logger
 
-from linktypes.type_settings import MultipleChoiceSetting, get_setting
+from linktypes.settings import MultipleChoiceSetting
 
 active = True
+name = 'Steam Library'
+defaults = {'game': {}}
 
 def locate_steam_main():
     candidates = ['C:\\Program Files\\Steam',
@@ -91,12 +93,9 @@ if active:
     else:
         active = False
 
-name = 'Steam Library'
-
-def config():
-    return [
-        MultipleChoiceSetting('game','Game',GAMENAMES),
-        ]
+def settings(values=None):
+    values = values or defaults
+    return {'game': MultipleChoiceSetting('Game', GAMENAMES, **values['game'])}
 
 vbs_template = (
     'On Error Resume Next\n'
@@ -107,10 +106,8 @@ vbs_template = (
     'shell.CurrentDirectory = steamPath\n'
     'shell.Run steamExe & steamCommand')
 
-    
 def get_vbs(config):
-    game_setting = get_setting(config,'game')
-    game_name = game_setting.value
+    game_name = config['settings']['game'].selection
     game = [game for game in GAMES if game['name'] == game_name][0]
     steam_exe = path.join(STEAM_MAIN, 'steam.exe')
     steam_path = STEAM_MAIN

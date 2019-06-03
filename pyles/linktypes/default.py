@@ -1,14 +1,14 @@
 from os.path import isdir, isfile, dirname, basename
 from kivy.logger import Logger
-from linktypes.type_settings import FilePathSetting, get_setting, LinktypeException
+from linktypes.settings import FilePathSetting, LinktypeException
 
 active = True
 name = 'Default (exe)'
+defaults = {'path': {}}
 
-def config():
-    return [
-        FilePathSetting('path','Path'),
-        ]
+def settings(values=None):
+    values = values or defaults
+    return {'path': FilePathSetting('Path', **values['path'])}
     
 vbs_file_template = (
     'On Error Resume Next\n'
@@ -25,8 +25,7 @@ vbs_dir_template = (
     'shell.Run appPath')
     
 def get_vbs(config):
-    path_setting = get_setting(config,'path')
-    path = path_setting.value
+    path = config['settings']['path'].path
     if isdir(path):
         return vbs_dir_template.format(path=path)
     elif isfile(path):
