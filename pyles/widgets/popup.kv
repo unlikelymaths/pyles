@@ -1,0 +1,53 @@
+#:kivy 1.0
+
+
+<PopupWidget>:
+    size_hint: (1, 1)
+
+<NotificationWidget>:
+    orientation: 'vertical'
+    Widget:
+        size_hint_y: None
+        height: 20
+    Label:
+        id: label
+        text_size: self.size
+        halign: 'left'
+        size_hint: (1, 0.1)
+        text: root.text
+    Widget:
+        size_hint_y: 1
+    Button:
+        size_hint: (1, None)
+        height: 30
+        text: 'Close'
+        on_press: root.on_close()
+
+<QuestionWidget>:
+    orientation: 'vertical'
+    alternatives: alternatives
+    yes_button: yes_button
+    no_button: no_button
+    Widget:
+        size_hint_y: None
+        height: 20
+    Label:
+        id: label
+        text_size: self.size
+        halign: 'left'
+        size_hint: (1, 0.1)
+        text: root.text
+    Widget:
+        size_hint_y: 1
+    BoxLayout:
+        id: alternatives
+        size_hint: (1, None)
+        height: 30
+        Button:
+            id: yes_button
+            text: 'Yes'
+            on_press: root.on_close()
+        Button:
+            id: no_button
+            text: 'No'
+            on_press: root.on_close()
