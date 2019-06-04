@@ -1,7 +1,6 @@
 #:kivy 1.0
 
 #:import ImageWidget widgets.image_widget.ImageWidget
-#:import SingleLabel widgets.common.SingleLabel
 #:import CardWidget widgets.card_widget.CardWidget
 
 <EntryWidget>:
@@ -26,9 +25,12 @@
                 width: 10
             BoxLayout:
                 orientation: 'vertical'
-                SingleLabel:
+                Label:
                     text: root.entry.name
                     id: name_input
+                    text_size: 100, None
+                    size: self.texture_size
+                    size_hint_y: None
                 Widget:
                     size_hint_y: 1
                 BoxLayout:
