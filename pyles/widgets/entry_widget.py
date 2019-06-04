@@ -10,6 +10,7 @@ from util import KeyboardListener
 from data.entry import Entry, EntryException
 from widgets.common import SingleLabel
 from widgets.status_bar import status
+from widgets.popup import question_dialog
 
 from widgets.util import widget_path
 
@@ -31,7 +32,7 @@ class EntryWidget(BoxLayout):
             self.app.set_widget('edit', self.entry)
             return True
 
-    def on_delete(self):
+    def delete(self):
         if self.entry is not None:
             name = self.entry.name
             text = 'Deleting entry {}'.format(name)
@@ -42,3 +43,7 @@ class EntryWidget(BoxLayout):
                 status.message(text, weak=True)
             except EntryException as e:
                 status.error(e)
+
+    def on_delete(self):
+        text = 'Delete entry {}?'.format(self.entry.name)
+        question_dialog(text=text, on_yes=self.delete, on_no=None)
