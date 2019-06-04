@@ -11,9 +11,28 @@ from data.manifest import get_manifest
 from data.icon import from_save
 from widgets.status_bar import status
 from linktypes.settings import LinktypeException
+from widgets.popup import question_dialog
 
 class EntryException(ValueError):
     pass
+
+def remove_entry(name):
+    # Remove directory
+    dir_path = path.join(MAINDIR, name)
+    try:
+        rmtree(dir_path)
+    except OSError:
+        text = 'Cannot delete data directory of entry {}'.format(name)
+        Logger.exception('entry: {}'.format(text))
+        raise EntryException(text)
+    # Remove link
+    link_path = path.join(LINKDIR, '{}.lnk'.format(name))
+    try:
+        remove(link_path)
+    except OSError:
+        text = 'Cannot delete link of entry {}'.format(name)
+        Logger.exception('entry: {}'.format(text))
+        raise EntryException(text)
 
 class EntryList():
     _list = None
@@ -26,12 +45,19 @@ class EntryList():
     def load_entries(self):
         # Iterate all directories in MAINDIR
         entry_names = [dir for dir in listdir(MAINDIR) if path.isdir(path.join(MAINDIR,dir))]
+        errors = []
         for name in entry_names:
             try:
                 entry = Entry(name)
                 self.entries.append(entry)
             except EntryException as e:
-                status.error(e)
+                errors.append((name,e))
+
+        # Show broken entries
+        if errors:
+            for error in errors:
+                text = 'Could not load {}.\n{}\nDelete entry?'.format(error[0], error[1])
+                question_dialog(text=text, on_yes=lambda: remove_entry(error[0]), on_no=None)
 
         # Remove all other links
         for link in listdir(LINKDIR):
@@ -138,20 +164,7 @@ class Entry():
         self.load_linktype()
         
     def delete(self):
-        # Remove directory
-        try:
-            rmtree(self.path)
-        except OSError:
-            text = 'Cannot delete data directory of entry {}'.format(self.name)
-            Logger.exception('entry: {}'.format(text))
-            raise EntryException(text)
-        # Remove link
-        try:
-            remove(self.link_path)
-        except OSError:
-            text = 'Cannot delete link of entry {}'.format(self.name)
-            Logger.exception('entry: {}'.format(text))
-            raise EntryException(text)
+        remove_entry(self.name)
         # Remove from list
         get_entry_list().remove_entry(self)
     
